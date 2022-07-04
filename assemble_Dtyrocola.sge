@@ -1,0 +1,37 @@
+#!/usr/bash/
+#$ -cwd
+#$ -e /mnt/Timina/lmorales/Public/OxfordNanopore/scripts/st/assemble_Dtyrocola.err
+#$ -o /mnt/Timina/lmorales/Public/OxfordNanopore/scripts/st/assemble_Dtyrocola.out
+#$ -N assemble_Dtyrocola
+#$ -l vf=16G
+#$ -S /bin/bash
+#$ -m e
+#$ -M jeanne.burdin.lfgeb@gmail.com
+#$ -pe openmp 4
+. /etc/profile.d/modules.sh
+##Prerequisite for porechop
+conda deactivate
+module unload python37/3.7.0
+module load python35/3.5.2 gcc/5.1.0
+##Prerequisite for canu
+module load gnuplot/5.2.6
+##Prerequisite for pilon
+module load htslib/1.2.1
+##Actual modules used
+module load porechop/0.2.4 filtlong/0.2.0 canu/1.8 smartdenovo/11sep19 guppy/4.2.2 bwa/0.7.13 racon/1.4.3 anaconda3/4.2.0 samtools/1.9 pilon/1.23
+#Umaydis
+#
+cd /mnt/Timina/lmorales/Public/OxfordNanopore/Dtyrocola/
+#
+echo 'Basecalling initialized'
+mkdir guppy_basecalling
+#
+guppy_basecaller -i /mnt/Timina/lmorales/Public/OxfordNanopore/Dtyrocola/fast5/ -s ./fastq/ --flowcell FLO-MIN106 --kit SQK-LSK109
+#
+echo 'Concatanating guppy output'
+cat ./fastq/*.fastq > ./fastq/all_guppy.fastq
+#
+echo 'Removing adapters from Dtyrocola'
+mkdir porechop
+porechop -i fastq/all_guppy.fastq -o porechop/no_adapters_Dtyrocola.fastq
+#
